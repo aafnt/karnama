@@ -1,0 +1,14 @@
+*.iml
+.gradle
+/local.properties
+/.idea
+.DS_Store
+/build
+/captures
+.externalNativeBuild
+.cxx
+local.properties
+
+# Keep the release keystore committed on purpose (needed so every build
+# signs with the same key — see keystore/README.md). Do NOT ignore it.
+!keystore/karnama-release.jks

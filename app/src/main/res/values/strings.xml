@@ -1,0 +1,61 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">کارنما</string>
+    <string name="app_slogan">کارها را ببین، انجام بده، پیگیری کن.</string>
+
+    <!-- Navigation -->
+    <string name="nav_tasks">کارها</string>
+    <string name="nav_calendar">تقویم</string>
+    <string name="nav_more">بیشتر</string>
+
+    <!-- Home -->
+    <string name="today">امروز</string>
+    <string name="yesterday">دیروز</string>
+    <string name="tomorrow">فردا</string>
+    <string name="empty_today_title">امروز کاری نداری</string>
+    <string name="empty_today_subtitle">کار جدیدت را اینجا بنویس.</string>
+    <string name="quick_add_placeholder">کار جدید را بنویسید…</string>
+
+    <!-- Actions -->
+    <string name="actions_title">اقدامات</string>
+    <string name="new_action_placeholder">اقدام جدید را بنویسید…</string>
+    <string name="submit_action">ثبت اقدام</string>
+    <string name="no_actions_yet">هنوز اقدامی ثبت نشده است.</string>
+
+    <!-- Multi-select -->
+    <string name="selected_count">%1$s کار انتخاب شد</string>
+    <string name="move_to_tomorrow">انتقال به فردا</string>
+    <string name="move_to_date">انتقال به تاریخ…</string>
+    <string name="delete">حذف</string>
+    <string name="cancel">انصراف</string>
+    <string name="confirm">تأیید</string>
+
+    <!-- Quick texts -->
+    <string name="quick_texts_title">متن‌های آماده</string>
+    <string name="quick_text_add">افزودن متن آماده</string>
+    <string name="quick_text_edit">ویرایش متن آماده</string>
+    <string name="quick_text_hint">متن را بنویسید…</string>
+    <string name="quick_text_keywords_hint">کلمات کلیدی را با ویرگول جدا کنید</string>
+    <string name="save">ذخیره</string>
+    <string name="suggestions_title">پیشنهادهای مرتبط</string>
+
+    <!-- More -->
+    <string name="more_quick_texts">متن‌های آماده</string>
+    <string name="more_done_tasks">کارهای انجام‌شده</string>
+    <string name="more_settings">تنظیمات</string>
+    <string name="more_backup">پشتیبان‌گیری / بازیابی</string>
+    <string name="more_about">درباره کارنما</string>
+
+    <!-- Settings -->
+    <string name="settings_title">تنظیمات</string>
+    <string name="settings_theme">پوسته برنامه</string>
+    <string name="theme_light">روشن</string>
+    <string name="theme_dark">تاریک</string>
+    <string name="theme_system">مطابق تنظیمات سیستم</string>
+
+    <!-- Calendar -->
+    <string name="calendar_title">تقویم</string>
+
+    <!-- About -->
+    <string name="about_description">کارنما، دفتر کار دیجیتال شما برای ثبت و پیگیری کارهای اداری روزانه.</string>
+</resources>
