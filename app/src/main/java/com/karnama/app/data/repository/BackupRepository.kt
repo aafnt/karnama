@@ -1,5 +1,6 @@
 package com.karnama.app.data.repository
 
+import androidx.room.withTransaction
 import com.karnama.app.data.local.KarnamaDatabase
 import com.karnama.app.data.local.entity.ActionEntity
 import com.karnama.app.data.local.entity.QuickTextEntity
@@ -12,14 +13,16 @@ import org.json.JSONObject
  * انسان‌خوان. این کار مستقل از نسخه‌ی برنامه است، پس حتی اگر ساختار
  * دیتابیس در آینده تغییر کند (به همراه Migration مناسب)، بک‌آپ‌های
  * قدیمی همچنان با نگاشت فیلد به فیلد قابل بازیابی می‌مانند.
+ *
+ * هر دو عملیات با database.withTransaction اجرا می‌شوند: هم برای اینکه
+ * (طبق قوانین Room) هرگز روی Main Thread اجرا نشوند و برنامه کرش نکند،
+ * و هم برای اینکه بازیابی یک عملیات atomic باشد (اگر وسط راه خطا بیفتد،
+ * داده‌های قبلی کاربر نصفه‌و‌نیمه پاک نمی‌شوند).
  */
 class BackupRepository(private val database: KarnamaDatabase) {
 
-    suspend fun exportToJson(): String {
-        val tasks = database.taskDao().let { dao ->
-            // از یک کوئری مستقیم برای گرفتن همه‌ی Taskها استفاده می‌کنیم
-            dao.getAllForBackup()
-        }
+    suspend fun exportToJson(): String = database.withTransaction {
+        val tasks = database.taskDao().getAllForBackup()
         val actions = database.actionDao().getAllForBackup()
         val quickTexts = database.quickTextDao().getAllForBackup()
 
@@ -68,7 +71,7 @@ class BackupRepository(private val database: KarnamaDatabase) {
         }
         root.put("quickTexts", quickTextsArray)
 
-        return root.toString(2)
+        root.toString(2)
     }
 
     /**
@@ -76,7 +79,7 @@ class BackupRepository(private val database: KarnamaDatabase) {
      * داده‌های فعلی حذف و سپس داده‌های بک‌آپ با همان شناسه‌های اصلی
      * درج می‌شوند.
      */
-    suspend fun importFromJson(json: String) {
+    suspend fun importFromJson(json: String): Unit = database.withTransaction {
         val root = JSONObject(json)
 
         database.clearAllTablesForBackup()

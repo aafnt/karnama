@@ -3,6 +3,7 @@ package com.karnama.app.ui.home
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.imePadding
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
@@ -35,6 +36,7 @@ fun HomeScreen(
             .fillMaxSize()
             .padding(padding)
             .padding(horizontal = 20.dp)
+            .imePadding()
         ) {
             if (uiState.selectionMode) {
                 SelectionToolbar(

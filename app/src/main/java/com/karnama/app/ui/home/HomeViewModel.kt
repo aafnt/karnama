@@ -1,5 +1,7 @@
 package com.karnama.app.ui.home
 
+import androidx.compose.ui.text.TextRange
+import androidx.compose.ui.text.input.TextFieldValue
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.karnama.app.data.repository.QuickText
@@ -21,7 +23,7 @@ data class HomeUiState(
     val selectedDay: PersianDate = PersianDate.today(),
     val dayTab: DayTab = DayTab.TODAY,
     val tasks: List<Task> = emptyList(),
-    val quickAddText: String = "",
+    val quickAddText: TextFieldValue = TextFieldValue(""),
     val suggestions: List<QuickText> = emptyList(),
     val selectionMode: Boolean = false,
     val selectedTaskIds: Set<Long> = emptySet(),
@@ -38,7 +40,12 @@ class HomeViewModel(
 
     private val selectedDay = MutableStateFlow(today)
     private val dayTab = MutableStateFlow(DayTab.TODAY)
-    private val quickAddText = MutableStateFlow("")
+    private val quickAddText = MutableStateFlow(TextFieldValue(""))
+    // بعد از انتخاب یک پیشنهاد، تا وقتی کاربر دوباره چیزی تایپ نکرده
+    // کادر پیشنهادها باید بسته بماند (وگرنه چون متن انتخاب‌شده خودش با
+    // جستجو مطابقت دارد، پیشنهاد بلافاصله دوباره ظاهر می‌شود و اصلاً
+    // بسته نمی‌شود).
+    private val suppressSuggestions = MutableStateFlow(false)
     private val selectionMode = MutableStateFlow(false)
     private val selectedTaskIds = MutableStateFlow<Set<Long>>(emptySet())
     private val showMoveToDateSheet = MutableStateFlow(false)
@@ -50,8 +57,10 @@ class HomeViewModel(
         taskRepository.observeTasksForDate(day.toGregorian().toEpochDay())
     }
 
-    private val suggestionsFlow = combine(quickAddText, allQuickTexts) { query, all ->
-        quickTextRepository.search(all, query)
+    private val suggestionsFlow = combine(
+        quickAddText, allQuickTexts, suppressSuggestions
+    ) { fieldValue, all, suppressed ->
+        if (suppressed) emptyList() else quickTextRepository.search(all, fieldValue.text)
     }
 
     private data class SelectionState(
@@ -70,7 +79,7 @@ class HomeViewModel(
     private data class DayAndInputState(
         val selectedDay: PersianDate,
         val dayTab: DayTab,
-        val quickAddText: String,
+        val quickAddText: TextFieldValue,
         val suggestions: List<QuickText>
     )
 
@@ -106,20 +115,30 @@ class HomeViewModel(
         exitSelectionMode()
     }
 
-    fun onQuickAddTextChange(text: String) {
-        quickAddText.value = text
+    fun onQuickAddTextChange(value: TextFieldValue) {
+        quickAddText.value = value
+        // کاربر دارد دوباره تایپ می‌کند، پس اگر پیشنهادها بسته شده بودند
+        // (به‌خاطر انتخاب قبلی) باید دوباره فعال شوند.
+        suppressSuggestions.value = false
     }
 
     fun applySuggestion(quickText: QuickText) {
-        quickAddText.value = quickText.text
+        // نشانگر را دقیقاً انتهای متنِ جایگزین‌شده قرار می‌دهیم تا کاربر
+        // بلافاصله بتواند بدون جابه‌جا کردن نشانگر به تایپ ادامه دهد.
+        quickAddText.value = TextFieldValue(
+            text = quickText.text,
+            selection = TextRange(quickText.text.length)
+        )
+        suppressSuggestions.value = true
     }
 
     fun submitQuickAdd() {
-        val text = quickAddText.value.trim()
+        val text = quickAddText.value.text.trim()
         if (text.isEmpty()) return
         viewModelScope.launch {
             taskRepository.addTask(text, selectedDay.value.toGregorian().toEpochDay())
-            quickAddText.value = ""
+            quickAddText.value = TextFieldValue("")
+            suppressSuggestions.value = false
         }
     }
 
