@@ -19,6 +19,8 @@ import kotlinx.coroutines.launch
 
 enum class DayTab { YESTERDAY, TODAY, TOMORROW }
 
+data class EditingTaskState(val taskId: Long, val text: TextFieldValue)
+
 data class HomeUiState(
     val selectedDay: PersianDate = PersianDate.today(),
     val dayTab: DayTab = DayTab.TODAY,
@@ -28,7 +30,8 @@ data class HomeUiState(
     val selectionMode: Boolean = false,
     val selectedTaskIds: Set<Long> = emptySet(),
     val showMoveToDateSheet: Boolean = false,
-    val actionsForTaskId: Long? = null
+    val actionsForTaskId: Long? = null,
+    val editingTask: EditingTaskState? = null
 )
 
 class HomeViewModel(
@@ -50,6 +53,7 @@ class HomeViewModel(
     private val selectedTaskIds = MutableStateFlow<Set<Long>>(emptySet())
     private val showMoveToDateSheet = MutableStateFlow(false)
     private val actionsForTaskId = MutableStateFlow<Long?>(null)
+    private val editingTask = MutableStateFlow<EditingTaskState?>(null)
 
     private val allQuickTexts = quickTextRepository.observeAll()
 
@@ -67,13 +71,14 @@ class HomeViewModel(
         val selectionMode: Boolean,
         val selectedTaskIds: Set<Long>,
         val showMoveToDateSheet: Boolean,
-        val actionsForTaskId: Long?
+        val actionsForTaskId: Long?,
+        val editingTask: EditingTaskState?
     )
 
     private val selectionState = combine(
-        selectionMode, selectedTaskIds, showMoveToDateSheet, actionsForTaskId
-    ) { mode, ids, showSheet, actionsId ->
-        SelectionState(mode, ids, showSheet, actionsId)
+        selectionMode, selectedTaskIds, showMoveToDateSheet, actionsForTaskId, editingTask
+    ) { mode, ids, showSheet, actionsId, editing ->
+        SelectionState(mode, ids, showSheet, actionsId, editing)
     }
 
     private data class DayAndInputState(
@@ -101,7 +106,8 @@ class HomeViewModel(
             selectionMode = selection.selectionMode,
             selectedTaskIds = selection.selectedTaskIds,
             showMoveToDateSheet = selection.showMoveToDateSheet,
-            actionsForTaskId = selection.actionsForTaskId
+            actionsForTaskId = selection.actionsForTaskId,
+            editingTask = selection.editingTask
         )
     }.stateIn(viewModelScope, SharingStarted.WhileSubscribed(5000), HomeUiState())
 
@@ -208,5 +214,34 @@ class HomeViewModel(
 
     fun closeActions() {
         actionsForTaskId.value = null
+    }
+
+    /** فقط زمانی معنا دارد که دقیقاً یک کار انتخاب شده باشد */
+    fun startEditingSelected() {
+        val id = selectedTaskIds.value.singleOrNull() ?: return
+        val currentTitle = uiState.value.tasks.find { it.id == id }?.title ?: return
+        editingTask.value = EditingTaskState(
+            taskId = id,
+            text = TextFieldValue(currentTitle, selection = TextRange(currentTitle.length))
+        )
+    }
+
+    fun onEditTextChange(value: TextFieldValue) {
+        editingTask.value = editingTask.value?.copy(text = value)
+    }
+
+    fun cancelEdit() {
+        editingTask.value = null
+    }
+
+    fun saveEdit() {
+        val state = editingTask.value ?: return
+        val newTitle = state.text.text.trim()
+        if (newTitle.isEmpty()) return
+        viewModelScope.launch {
+            taskRepository.updateTitle(state.taskId, newTitle)
+            editingTask.value = null
+            exitSelectionMode()
+        }
     }
 }

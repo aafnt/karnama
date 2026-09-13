@@ -27,6 +27,7 @@
     <string name="move_to_tomorrow">انتقال به فردا</string>
     <string name="move_to_date">انتقال به تاریخ…</string>
     <string name="delete">حذف</string>
+    <string name="edit">ویرایش</string>
     <string name="cancel">انصراف</string>
     <string name="confirm">تأیید</string>
 
@@ -38,6 +39,7 @@
     <string name="quick_text_keywords_hint">کلمات کلیدی را با ویرگول جدا کنید</string>
     <string name="save">ذخیره</string>
     <string name="suggestions_title">پیشنهادهای مرتبط</string>
+    <string name="edit_task_title">ویرایش کار</string>
 
     <!-- More -->
     <string name="more_quick_texts">متن‌های آماده</string>

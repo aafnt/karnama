@@ -2,6 +2,7 @@ package com.karnama.app.ui.home
 
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.consumeWindowInsets
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.imePadding
 import androidx.compose.foundation.layout.padding
@@ -18,7 +19,6 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import com.karnama.app.ui.actions.ActionsBottomSheet
 import com.karnama.app.ui.actions.ActionsViewModel
-import com.karnama.app.util.toFaDigits
 
 @Composable
 fun HomeScreen(
@@ -35,13 +35,19 @@ fun HomeScreen(
         Column(modifier = Modifier
             .fillMaxSize()
             .padding(padding)
-            .padding(horizontal = 20.dp)
+            // اگر این padding را «مصرف‌شده» علامت نزنیم، وقتی imePadding هم
+            // اضافه شود، هم ارتفاع نوار پایین (bottomBar) و هم ارتفاع
+            // صفحه‌کلید با هم جمع می‌شوند و یک فاصله‌ی خالی بزرگ و اضافه
+            // بین ورودی و صفحه‌کلید ایجاد می‌شود.
+            .consumeWindowInsets(padding)
             .imePadding()
+            .padding(horizontal = 20.dp)
         ) {
             if (uiState.selectionMode) {
                 SelectionToolbar(
                     selectedCount = uiState.selectedTaskIds.size,
                     onClose = viewModel::exitSelectionMode,
+                    onEdit = viewModel::startEditingSelected,
                     onMoveToTomorrow = viewModel::moveSelectedToTomorrow,
                     onMoveToDate = viewModel::openMoveToDateSheet,
                     onDelete = viewModel::deleteSelected
@@ -101,6 +107,15 @@ fun HomeScreen(
         MoveToDateSheet(
             onDismiss = viewModel::dismissMoveToDateSheet,
             onDateSelected = viewModel::moveSelectedToDate
+        )
+    }
+
+    uiState.editingTask?.let { editing ->
+        EditTaskDialog(
+            text = editing.text,
+            onTextChange = viewModel::onEditTextChange,
+            onDismiss = viewModel::cancelEdit,
+            onSave = viewModel::saveEdit
         )
     }
 

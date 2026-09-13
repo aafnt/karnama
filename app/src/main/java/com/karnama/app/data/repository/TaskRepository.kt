@@ -52,6 +52,8 @@ class TaskRepository(
 
     suspend fun setCompleted(id: Long, completed: Boolean) = taskDao.setCompleted(id, completed)
 
+    suspend fun updateTitle(id: Long, newTitle: String) = taskDao.updateTitle(id, newTitle.trim())
+
     suspend fun moveTasks(ids: List<Long>, newEpochDay: Long) = taskDao.moveTasksToDate(ids, newEpochDay)
 
     suspend fun deleteTasks(ids: List<Long>) = taskDao.deleteByIds(ids)

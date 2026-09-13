@@ -32,6 +32,9 @@ interface TaskDao {
     @Query("UPDATE tasks SET completed = :completed, updatedAt = :updatedAt WHERE id = :id")
     suspend fun setCompleted(id: Long, completed: Boolean, updatedAt: Long = System.currentTimeMillis())
 
+    @Query("UPDATE tasks SET title = :title, updatedAt = :updatedAt WHERE id = :id")
+    suspend fun updateTitle(id: Long, title: String, updatedAt: Long = System.currentTimeMillis())
+
     @Query("UPDATE tasks SET dueDateEpochDay = :newEpochDay, updatedAt = :updatedAt WHERE id IN (:ids)")
     suspend fun moveTasksToDate(ids: List<Long>, newEpochDay: Long, updatedAt: Long = System.currentTimeMillis())
 

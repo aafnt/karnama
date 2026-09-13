@@ -57,7 +57,7 @@ fun TaskRow(
                 onLongClick = onLongPress,
                 onDoubleClick = onOpenActions
             )
-            .padding(horizontal = 12.dp, vertical = 14.dp),
+            .padding(horizontal = 12.dp, vertical = 6.dp),
         verticalAlignment = Alignment.CenterVertically
     ) {
         Checkbox(
@@ -65,7 +65,7 @@ fun TaskRow(
             onCheckedChange = { onToggleCompleted() },
             colors = CheckboxDefaults.colors(
                 checkedColor = MaterialTheme.colorScheme.primary,
-                uncheckedColor = MaterialTheme.colorScheme.outline
+                uncheckedColor = MaterialTheme.colorScheme.onSurfaceVariant
             )
         )
 
@@ -83,6 +83,8 @@ fun TaskRow(
             },
             style = MaterialTheme.typography.bodyLarge,
             color = textColor,
+            maxLines = 2,
+            overflow = androidx.compose.ui.text.style.TextOverflow.Ellipsis,
             modifier = Modifier.weight(1f)
         )
 
